@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивный Школьный Тренажёр</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(17, 24, 39, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .animated-bg {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #certificatePrintArea, #certificatePrintArea * {
+                visibility: visible;
+            }
+            #certificatePrintArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300 flex flex-col">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 w-full glass shadow-sm transition-all duration-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="app.showHome()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight">Школьный Ассистент</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Интерактивный тренажёр знаний</p>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center gap-3">
+                <button id="themeToggleBtn" onclick="app.toggleTheme()" class="p-2.5 rounded-xl hover:bg-slate-200/60 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors" title="Переключить тему">
+                    <i class="fa-solid fa-moon text-lg dark:hidden"></i>
+                    <i class="fa-solid fa-sun text-lg hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+        <!-- VIEW 1: Home Screen (Trainer Selector) -->
+        <section id="viewHome" class="space-y-8 animate-fade-in">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold tracking-wide uppercase">Проверь свои знания</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Выберите интерактивный тренажёр</h2>
+                <p class="text-slate-600 dark:text-slate-300 text-base sm:text-lg">Пройдите 25 вопросов по 5 предметам, проверьте свои навыки и получите именной сертификат об успешном прохождении!</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <!-- Trainer Card 1 -->
+                <div class="glass rounded-3xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between hover:-translate-y-1 duration-300 relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg uppercase tracking-wider">Часть 1</span>
+                            <span class="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ~15 минут</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Тренажёр №1: Точные и Естественные науки</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Проверьте знания по фундаментальным наукам, физическим законам и историческим событиям.</p>
+                        
+                        <div class="space-y-2 mb-8">
+                            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Предметы в блоке:</div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-atom text-blue-500"></i> Физика</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-square-root-variable text-indigo-500"></i> Математика</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-flask text-emerald-500"></i> Химия</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-dna text-teal-500"></i> Биология</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-landmark text-amber-500"></i> История</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="app.startTrainer(0)" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-center shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group-hover:scale-[1.01]">
+                        Начать Тренажёр 1 <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Trainer Card 2 -->
+                <div class="glass rounded-3xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between hover:-translate-y-1 duration-300 relative overflow-hidden group">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 bg-purple-500 text-white text-xs font-bold rounded-lg uppercase tracking-wider">Часть 2</span>
+                            <span class="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1"><i class="fa-regular fa-clock"></i> ~15 минут</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Тренажёр №2: Гуманитарные науки и ИТ</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">Проверьте грамотность, географические знания, знания литературы, английского и IT.</p>
+                        
+                        <div class="space-y-2 mb-8">
+                            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Предметы в блоке:</div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-earth-americas text-sky-500"></i> География</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-spell-check text-rose-500"></i> Русский язык</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-book-open text-amber-600"></i> Литература</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-language text-purple-500"></i> Английский</span>
+                                <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-code text-cyan-500"></i> Информатика</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="app.startTrainer(1)" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold text-center shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2 group-hover:scale-[1.01]">
+                        Начать Тренажёр 2 <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: Quiz Active Screen -->
+        <section id="viewQuiz" class="hidden space-y-6 max-w-4xl mx-auto w-full">
+            <!-- Top Quiz Bar -->
+            <div class="glass p-4 sm:p-5 rounded-2xl shadow-lg border border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <button onclick="app.showHome()" class="text-xs px-3 py-2 rounded-xl bg-slate-200/70 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 font-medium">
+                        <i class="fa-solid fa-arrow-left"></i> Выход
+                    </button>
+                    <span id="quizTitle" class="font-bold text-sm sm:text-base text-blue-600 dark:text-blue-400">Тренажёр №1</span>
+                </div>
+
+                <!-- Subject Tabs Navigation -->
+                <div id="subjectTabs" class="flex overflow-x-auto w-full sm:w-auto gap-1 pb-1 sm:pb-0 scrollbar-none">
+                    <!-- Dynamic subject buttons rendered here -->
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <span id="progressText">Вопрос 1 из 25</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="glass rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200/80 dark:border-slate-800 space-y-6 relative">
+                <!-- Subject Badge & Counter -->
+                <div class="flex justify-between items-center">
+                    <span id="subjectBadge" class="px-3.5 py-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-xl text-xs font-bold tracking-wide uppercase flex items-center gap-2">
+                        <!-- Subject Name -->
+                    </span>
+                    <span id="questionCounter" class="text-xs font-semibold text-slate-400">Вопрос 1/5 в разделе</span>
+                </div>
+
+                <!-- Question Text -->
+                <h3 id="questionText" class="text-xl sm:text-2xl font-bold leading-snug">
+                    <!-- Question string -->
+                </h3>
+
+                <!-- Options List -->
+                <div id="optionsContainer" class="space-y-3 pt-2">
+                    <!-- Option buttons -->
+                </div>
+
+                <!-- Explanation Box -->
+                <div id="explanationBox" class="hidden p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 space-y-1 text-sm animate-fade-in">
+                    <div id="explanationHeader" class="font-bold flex items-center gap-2">
+                        <!-- Correct/Incorrect tag -->
+                    </div>
+                    <p id="explanationText" class="text-slate-600 dark:text-slate-300">
+                        <!-- Explanation text -->
+                    </p>
+                </div>
+
+                <!-- Card Navigation Bottom -->
+                <div class="flex justify-between items-center pt-4 border-t border-slate-200/60 dark:border-slate-800">
+                    <button id="prevBtn" onclick="app.prevQuestion()" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-200/60 dark:hover:bg-slate-800 text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-left text-xs"></i> Назад
+                    </button>
+
+                    <button id="nextBtn" onclick="app.nextQuestion()" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2">
+                        Далее <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: Results & Certificate Generator -->
+        <section id="viewResults" class="hidden space-y-8 max-w-4xl mx-auto w-full animate-fade-in">
+            <div class="glass rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-200/80 dark:border-slate-800 text-center space-y-6">
+                
+                <div class="inline-flex p-4 rounded-full bg-gradient-to-tr from-amber-400 to-amber-600 text-white shadow-xl shadow-amber-500/30">
+                    <i class="fa-solid fa-trophy text-4xl"></i>
+                </div>
+
+                <div>
+                    <h2 class="text-3xl font-extrabold">Тестирование завершено!</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Поздравляем с прохождением всех заданий тренажёра</p>
+                </div>
+
+                <!-- Score Summary Box -->
+                <div class="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                    <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <span class="block text-xs text-slate-400 uppercase font-bold">Итоговый результат</span>
+                        <span id="finalScoreText" class="text-2xl font-black text-blue-600 dark:text-blue-400">0 / 25</span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <span class="block text-xs text-slate-400 uppercase font-bold">Успешность</span>
+                        <span id="finalPercentText" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">0%</span>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <span class="block text-xs text-slate-400 uppercase font-bold">Оценка</span>
+                        <span id="finalGradeText" class="text-2xl font-black text-purple-600 dark:text-purple-400">Отлично</span>
+                    </div>
+                </div>
+
+                <!-- Subject Breakdown -->
+                <div class="space-y-3 text-left max-w-2xl mx-auto pt-2">
+                    <h4 class="font-bold text-sm uppercase tracking-wider text-slate-400">Детализация по предметам:</h4>
+                    <div id="subjectBreakdown" class="space-y-2">
+                        <!-- Dynamic subject score breakdown -->
+                    </div>
+                </div>
+
+                <!-- Certificate Name Form Section -->
+                <div class="pt-6 border-t border-slate-200 dark:border-slate-800 max-w-xl mx-auto space-y-4">
+                    <div class="space-y-1">
+                        <h3 class="text-xl font-bold flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-certificate text-amber-500"></i> Получите персональный сертификат
+                        </h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Введите ваше имя для автоматического формирования официального сертификата</p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="userNameInput" placeholder="Иван Иванов" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button onclick="app.generateCertificate()" class="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2">
+                            Сформировать <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Certificate Card Container -->
+            <div id="certificateContainer" class="hidden glass rounded-3xl p-6 sm:p-8 shadow-2xl border border-amber-300/50 dark:border-amber-500/20 space-y-6 text-center animate-fade-in">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h3 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-award text-amber-500 text-xl"></i> Ваш сертификат готов!
+                    </h3>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <button onclick="app.downloadCertificate()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+                            <i class="fa-solid fa-download"></i> Скачать PNG
+                        </button>
+                        <button onclick="app.printCertificate()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+                            <i class="fa-solid fa-print"></i> Печать / PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive Canvas Preview -->
+                <div class="overflow-x-auto p-2 bg-slate-900/5 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-slate-800 flex justify-center">
+                    <canvas id="certificateCanvas" width="1000" height="700" class="max-w-full h-auto rounded-xl shadow-lg border border-slate-300 dark:border-slate-700"></canvas>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex justify-center gap-4">
+                <button onclick="app.showHome()" class="px-6 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 font-bold text-sm transition-colors">
+                    <i class="fa-solid fa-house"></i> На главную
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Hidden Printable Printable Container -->
+    <div id="certificatePrintArea" class="hidden">
+        <img id="printImage" src="" class="w-full h-auto">
+    </div>
+
+    <script>
+        // Data structure for the Quiz Trainers
+        const QUIZ_DATA = [
+            {
+                id: 1,
+                title: "Тренажёр №1: Точные и Естественные науки",
+                subjects: [
+                    {
+                        name: "Физика",
+                        icon: "fa-atom",
+                        color: "blue",
+                        questions: [
+                            {
+                                q: "Какое из приведенных ниже уравнений описывает Второй закон Ньютона?",
+                                options: ["F = m·a", "E = m·c²", "P = I·V", "F = G·(m1·m2)/r²"],
+                                correct: 0,
+                                explanation: "Второй закон Ньютона утверждает, что ускорение тела прямо пропорционально равнодействующей всех сил и обратно пропорционально массе: F = m·a."
+                            },
+                            {
+                                q: "В каких единицах в системе СИ измеряется электрическое сопротивление?",
+                                options: ["Ампер", "Вольт", "Ом", "Джоуль"],
+                                correct: 2,
+                                explanation: "Единицей измерения электрического сопротивления в Международной системе единиц (СИ) является Ом (Ом)."
+                            },
+                            {
+                                q: "Какова скорость света в вакууме?",
+                                options: ["~300 000 км/с", "~150 000 км/с", "~1 000 000 км/с", "~340 м/с"],
+                                correct: 0,
+                                explanation: "Скорость света в вакууме является фундаментальной физической постоянной и равна примерно 300 000 км/с (299 792 458 м/с)."
+                            },
+                            {
+                                q: "Какой процесс называется конвекцией?",
+                                options: [
+                                    "Перенос теплоты струями жидкости или газа",
+                                    "Теплообмен через излучение волн",
+                                    "Передача тепла при непосредственном контакте твердых тел",
+                                    "Переход вещества из твердого состояния в газообразное"
+                                ],
+                                correct: 0,
+                                explanation: "Конвекция — это вид теплообмена, при котором энергия переносится струями или потоками самой жидкости или газа."
+                            },
+                            {
+                                q: "Какое явление объясняет разложение белого света в спектр при прохождении через призму?",
+                                options: ["Дифракция", "Дисперсия", "Интерференция", "Поляризация"],
+                                correct: 1,
+                                explanation: "Дисперсия света — это зависимость показателя преломления вещества от частоты (длины волны) света."
+                            }
+                        ]
+                    },
+                    {
+                        name: "Математика",
+                        icon: "fa-square-root-variable",
+                        color: "indigo",
+                        questions: [
+                            {
+                                q: "Чему равна производная функции f(x) = x³ - 4x + 7?",
+                                options: ["3x² - 4", "3x² - 4x", "x² - 4", "3x³ - 4"],
+                                correct: 0,
+                                explanation: "По правилам дифференцирования: (x³)' = 3x², (-4x)' = -4, (7)' = 0. Итого: f'(x) = 3x² - 4."
+                            },
+                            {
+                                q: "Решите уравнение: 2x - 8 = 10",
+                                options: ["x = 5", "x = 9", "x = 1", "x = 18"],
+                                correct: 1,
+                                explanation: "2x = 10 + 8 => 2x = 18 => x = 9."
+                            },
+                            {
+                                q: "Чему равен косинус угла 60 градусов (cos 60°)?",
+                                options: ["1/2", "√3/2", "√2/2", "1"],
+                                correct: 0,
+                                explanation: "Значение cos(60°) в тригонометрии равно 0.5 или 1/2."
+                            },
+                            {
+                                q: "Чему равна площадь круга радиусом R = 5 см?",
+                                options: ["25π см²", "10π см²", "5π см²", "50π см²"],
+                                correct: 0,
+                                explanation: "Формула площади круга S = π·R². При R=5: S = π·5² = 25π см²."
+                            },
+                            {
+                                q: "Чему равна сумма углов любого выпуклого четырехугольника?",
+                                options: ["180°", "360°", "270°", "540°"],
+                                correct: 1,
+                                explanation: "Сумма внутренних углов любого выпуклого четырехугольника всегда равна 360°."
+                            }
+                        ]
+                    },
+                    {
+                        name: "Химия",
+                        icon: "fa-flask",
+                        color: "emerald",
+                        questions: [
+                            {
+                                q: "Какой из перечисленных оксидов является амфотерным?",
+                                options: ["Al₂O₃", "Na₂O", "CO₂", "SO₃"],
+                                correct: 0,
+                                explanation: "Оксид алюминия Al₂O₃ проявляет как основные, так и кислотные свойства, то есть является амфотерным."
+                            },
+                            {
+                                q: "Какое химическое вещество имеет формулу H₂SO₄?",
+                                options: ["Соляная кислота", "Серная кислота", "Азотная кислота", "Уксусная кислота"],
+                                correct: 1,
+                                explanation: "H₂SO₄ — химическая формула серной кислоты."
+                            },
+                            {
+                                q: "Сколько электронов находится на внешнем электронном слое атома углерода (C)?",
+                                options: ["2", "4", "6", "8"],
+                                correct: 1,
+                                explanation: "Углерод находится в IV группе периодической системы, поэтому на его внешнем слое 4 валентных электрона."
+                            },
+                            {
+                                q: "Как называется процесс отдачи электронов атомом или ионом?",
+                                options: ["Восстановление", "Окисление", "Нейтрализация", "Гидратация"],
+                                correct: 1,
+                                explanation: "Окисление — процесс отдачи электронов (степень окисления при этом увеличивается)."
+                            },
+                            {
+                                q: "Какой газ преобладает в составе сухого воздуха у поверхности Земли?",
+                                options: ["Кислород", "Азот", "Углекислый газ", "Аргон"],
+                                correct: 1,
+                                explanation: "Воздух состоит примерно на 78% из азота (N₂) и на 21% из кислорода (O₂)."
+                            }
+                        ]
+                    },
+                    {
+                        name: "Биология",
+                        icon: "fa-dna",
+                        color: "teal",
+                        questions: [
+                            {
+                                q: "Какая органелла клетки отвечает за синтез АТФ («энергетическая станция» клетки)?",
+                                options: ["Митохондрия", "Рибосома", "Комплекс Гольджи", "Лизосома"],
+                                correct: 0,
+                                explanation: "Митохондрии обеспечивают клетку энергией в виде АТФ путем клеточного дыхания."
+                            },
+                            {
+                                q: "Какой пигмент придаёт растениям зелёный цвет и участвует в фотосинтезе?",
+                                options: ["Гемоглобин", "Каротин", "Хлорофилл", "Меланин"],
+                                correct: 2,
+                                explanation: "Хлорофилл находится в хлоропластах и поглощает свет для процесса фотосинтеза."
+                            },
+                            {
+                                q: "Сколько камер имеет сердце взрослого человека?",
+                                options: ["2", "3", "4", "5"],
+                                correct: 2,
+                                explanation: "Сердце человека состоит из 4 камер: двух предсердий и двух желудочков."
+                            },
+                            {
+                                q: "Как называется совокупность всех генов организма?",
+                                options: ["Фенотип", "Генотип", "Кариотип", "Геном"],
+                                correct: 1,
+                                explanation: "Генотип — это генетическая конституция организма, совокупность всех его генов."
+                            },
+                            {
+                                q: "Какая группа организмов относится к продуцентам в экосистеме?",
+                                options: ["Грибы", "Зеленые растения", "Травоядные животные", "Хищники"],
+                                correct: 1,
+                                explanation: "Продуценты — автотрофные организмы (растения), способные создавать органические вещества из неорганических."
+                            }
+                        ]
+                    },
+                    {
+                        name: "История",
+                        icon: "fa-landmark",
+                        color: "amber",
+                        questions: [
+                            {
+                                q: "В каком году произошла Куликовская битва?",
+                                options: ["1242 г.", "1380 г.", "1480 г.", "1612 г."],
+                                correct: 1,
+                                explanation: "Куликовская битва состоялась 8 сентября 1380 года на Куликовом поле."
+                            },
+                            {
+                                q: "Кто был первым российским императором?",
+                                options: ["Иван IV Грозный", "Пётр I Великий", "Екатерина II", "Александр I"],
+                                correct: 1,
+                                explanation: "Пётр I принял титул Императора Всероссийского в 1721 году после победы в Северной войне."
+                            },
+                            {
+                                q: "В каком году произошел падение Западной Римской империи?",
+                                options: ["476 г. н.э.", "395 г. н.э.", "1453 г. н.э.", "1054 г. н.э."],
+                                correct: 0,
+                                explanation: "В 476 году вождь германцев Одоакр низложил последнего римского императора Ромула Августула."
+                            },
+                            {
+                                q: "Какой документ принял царь Николай II 17 октября 1905 года?",
+                                options: ["Соборное уложение", "Манифест об отмене крепостного права", "Манифест об усовершенствовании государственного порядка", "Табель о рангах"],
+                                correct: 2,
+                                explanation: "Манифест 17 октября 1905 года даровал гражданские свободы и учреждал Государственную Думу."
+                            },
+                            {
+                                q: "Как называлась военная операция СССР по освобождению Беларуси в 1944 году?",
+                                options: ["«Уран»", "«Багратион»", "«Цитадель»", "«Кутузов»"],
+                                correct: 1,
+                                explanation: "Белорусская наступательная операция «Багратион» проходила с 23 июня по 29 августа 1944 года."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Тренажёр №2: Гуманитарные науки и ИТ",
+                subjects: [
+                    {
+                        name: "География",
+                        icon: "fa-earth-americas",
+                        color: "sky",
+                        questions: [
+                            {
+                                q: "Какой пролив отделяет Азию от Северной Америки?",
+                                options: ["Гибралтарский пролив", "Берингов пролив", "Магелланов пролив", "Ла-Манш"],
+                                correct: 1,
+                                explanation: "Берингов пролив соединяет Чукотское море и Берингово море, разделяя Евразию и Северную Америку."
+                            },
+                            {
+                                q: "Какое озеро является самым глубоким на планете Земля?",
+                                options: ["Каспийское море", "Озеро Верхнее", "Байкал", "Танганьика"],
+                                correct: 2,
+                                explanation: "Озеро Байкал — самое глубокое озеро в мире, его максимальная глубина составляет 1642 метра."
+                            },
+                            {
+                                q: "Какое государство является крупнейшим по площади территории в мире?",
+                                options: ["Канада", "Китай", "США", "Россия"],
+                                correct: 3,
+                                explanation: "Площадь территории России составляет более 17 миллионов квадратных километров."
+                            },
+                            {
+                                q: "Какая горная система является высочайшей на Земле?",
+                                options: ["Анды", "Альпы", "Гималаи", "Кордильеры"],
+                                correct: 2,
+                                explanation: "Гималаи — высочайшая горная система, в которой расположен высочайший пик Земли — Эверест (8848 м)."
+                            },
+                            {
+                                q: "Столицей какого государства является город Канберра?",
+                                options: ["Новая Зеландия", "Австралия", "Канада", "ЮАР"],
+                                correct: 1,
+                                explanation: "Канберра является официальной столицей Австралийского Союза."
+                            }
+                        ]
+                    },
+                    {
+                        name: "Русский язык",
+                        icon: "fa-spell-check",
+                        color: "rose",
+                        questions: [
+                            {
+                                q: "В каком слове допущена ошибка в ударении?",
+                                options: ["звони́т", "торты́", "догово́р", "кварта́л"],
+                                correct: 1,
+                                explanation: "Правильное ударение — то́рты (на первый слог)."
+                            },
+                            {
+                                q: "Укажите предложение с грамматической ошибкой:",
+                                options: [
+                                    "Все, кто любил театр, пришли на спектакль.",
+                                    "Те, кто пришел раньше, заняли лучшие места.",
+                                    "Все, кто пришли на концерт, остались довольны.",
+                                    "Те, кто читает книги, много знают."
+                                ],
+                                correct: 2,
+                                explanation: "Ошибка в «Все, кто пришли...». При местоимении «кто» глагол-сказуемое должен быть в единственном числе: «кто пришёл»."
+                            },
+                            {
+                                q: "Сколько букв «Н» пишется в слове «Стекля...ый»?",
+                                options: ["Одна Н", "Две НН", "Зависит от контекста", "Три НН"],
+                                correct: 1,
+                                explanation: "Стеклянный — исключение из правила суффиксов -ян-/-ан-, пишется с ДВУМЯ «нн» (как оловянный и деревянный)."
+                            },
+                            {
+                                q: "Каким членом предложения является причастный оборот?",
+                                options: ["Дополнение", "Определение", "Обстоятельство", "Сказуемое"],
+                                correct: 1,
+                                explanation: "Причастие и причастный оборот отвечают на вопрос «какой?» и являются определениями."
+                            },
+                            {
+                                q: "Выберите верный вариант раздельного/слитного написания:",
+                                options: ["Не смотря на дождь", "Несмотря на дождь", "Ни смотря на дождь", "Низмотря на дождь"],
+                                correct: 1,
+                                explanation: "В значении предлога «несмотря на» (вопреки чему-то) пишется слитно."
+                            }
+                        ]
+                    },
+                    {
+                        name: "Литература",
+                        icon: "fa-book-open",
+                        color: "amber",
+                        questions: [
+                            {
+                                q: "Кто из поэтов является автором романтической поэмы «Мцыри»?",
+                                options: ["А. С. Пушкин", "М. Ю. Лермонтов", "Н. А. Некрасов", "Ф. И. Тютчев"],
+                                correct: 1,
+                                explanation: "Поэма «Мцыри» была написана Михаилом Юрьевичем Лермонтовым в 1839 году."
+                            },
+                            {
+                                q: "Какое произведение открывает цикл романных историй И. А. Гончарова?",
+                                options: ["Обломов", "Обыкновенная история", "Обрыв", "Отцы и дети"],
+                                correct: 1,
+                                explanation: "«Обыкновенная история» — первый роман Трилогии Гончарова на букву «О»."
+                            },
+                            {
+                                q: "Как зовут главного героя романа Ф. М. Достоевского «Преступление и наказание»?",
+                                options: ["Евгений Онегин", "Печорин", "Родион Раскольников", "Пьер Безухов"],
+                                correct: 2,
+                                explanation: "Главный герой произведения — студент Родион Романович Раскольников."
+                            },
+                            {
+                                q: "Какой литературный жанр представляет собой произведение А. С. Грибоедова «Горе от ума»?",
+                                options: ["Трагедия", "Комедия в стихах", "Роман-эпопея", "Повесть"],
+                                correct: 1,
+                                explanation: "«Горе от ума» — классическая комедия в стихах."
+                            },
+                            {
+                                q: "Кто написал поэму «Кому на Руси жить хорошо»?",
+                                options: ["Н. А. Некрасов", "И. С. Тургенев", "Л. Н. Толстой", "А. П. Чехов"],
+                                correct: 0,
+                                explanation: "Автором этой эпической поэмы является Николай Алексеевич Некрасов."
+                            }
+                        ]
+                    },
+                    {
+                        name: "Английский",
+                        icon: "fa-language",
+                        color: "purple",
+                        questions: [
+                            {
+                                q: "Which option correctly completes the sentence: 'If I _____ more time, I would learn Spanish.'?",
+                                options: ["have", "had", "will have", "would have"],
+                                correct: 1,
+                                explanation: "Это условное предложение 2-го типа (Second Conditional): If + Past Simple, would + Infinitive. Правильно: HAD."
+                            },
+                            {
+                                q: "What is the past simple form of the irregular verb 'Go'?",
+                                options: ["Gone", "Goed", "Went", "Going"],
+                                correct: 2,
+                                explanation: "Вторая форма неправильного глагола to go — WENT."
+                            },
+                            {
+                                q: "Choose the correct antonym for the word 'Ancient':",
+                                options: ["Old", "Modern", "Huge", "Difficult"],
+                                correct: 1,
+                                explanation: "'Ancient' означает «древний», а антонимом к нему является 'Modern' («современный»)."
+                            },
+                            {
+                                q: "Complete the sentence: 'She has been working here _____ 2018.'",
+                                options: ["for", "since", "during", "from"],
+                                correct: 1,
+                                explanation: "Для указания точного момента начала действия во времени (Present Perfect) используется предлог 'SINCE'."
+                            },
+                            {
+                                q: "Which word is a noun?",
+                                options: ["Quickly", "Beautiful", "Happiness", "Create"],
+                                correct: 2,
+                                explanation: "'Happiness' (счастье) — существительное. Quickly — наречие, Beautiful — прилагательное, Create — глагол."
+                            }
+                        ]
+                    },
+                    {
+                        name: "Информатика",
+                        icon: "fa-code",
+                        color: "cyan",
+                        questions: [
+                            {
+                                q: "Какова временная сложность алгоритма бинарного поиска в отсортированном массиве из n элементов?",
+                                options: ["O(n)", "O(log n)", "O(n²)", "O(1)"],
+                                correct: 1,
+                                explanation: "Бинарный поиск на каждом шаге делит массив пополам, поэтому его временная сложность составляет O(log n)."
+                            },
+                            {
+                                q: "Сколько бит содержится в одном байте?",
+                                options: ["4", "8", "16", "1024"],
+                                correct: 1,
+                                explanation: "1 байт равен 8 битам."
+                            },
+                            {
+                                q: "Какое число в десятичной системе счисления соответствует двоичному числу 1010₂?",
+                                options: ["8", "10", "12", "14"],
+                                correct: 1,
+                                explanation: "1010₂ = 1·2³ + 0·2² + 1·2¹ + 0·2⁰ = 8 + 0 + 2 + 0 = 10."
+                            },
+                            {
+                                q: "Что из перечисленного является энергозависимой памятью (теряет данные при выключении питания)?",
+                                options: ["ROM (ПЗУ)", "RAM (ОЗУ)", "SSD", "HDD"],
+                                correct: 1,
+                                explanation: "Оперативная память (RAM) требует постоянной подачи энергии для сохранения данных."
+                            },
+                            {
+                                q: "Какое расширение по умолчанию имеют файлы скриптов Python?",
+                                options: [".html", ".js", ".py", ".cpp"],
+                                correct: 2,
+                                explanation: "Исходные файлы языка программирования Python имеют расширение .py."
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        class App {
+            constructor() {
+                this.currentTrainerIdx = 0;
+                this.currentSubjectIdx = 0;
+                this.currentQuestionIdx = 0;
+                this.userAnswers = {}; // key: "subjIdx-qIdx", val: chosenOptionIdx
+                this.isDark = false;
+            }
+
+            init() {
+                this.showHome();
+            }
+
+            toggleTheme() {
+                this.isDark = !this.isDark;
+                if (this.isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+
+            showHome() {
+                document.getElementById('viewHome').classList.remove('hidden');
+                document.getElementById('viewQuiz').classList.add('hidden');
+                document.getElementById('viewResults').classList.add('hidden');
+            }
+
+            startTrainer(trainerIdx) {
+                this.currentTrainerIdx = trainerIdx;
+                this.currentSubjectIdx = 0;
+                this.currentQuestionIdx = 0;
+                this.userAnswers = {};
+
+                document.getElementById('viewHome').classList.add('hidden');
+                document.getElementById('viewQuiz').classList.remove('hidden');
+                document.getElementById('viewResults').classList.add('hidden');
+
+                const trainer = QUIZ_DATA[this.currentTrainerIdx];
+                document.getElementById('quizTitle').innerText = trainer.title;
+
+                this.renderSubjectTabs();
+                this.loadQuestion();
+            }
+
+            renderSubjectTabs() {
+                const trainer = QUIZ_DATA[this.currentTrainerIdx];
+                const container = document.getElementById('subjectTabs');
+                container.innerHTML = '';
+
+                trainer.subjects.forEach((subj, idx) => {
+                    const btn = document.createElement('button');
+                    const isActive = idx === this.currentSubjectIdx;
+                    btn.className = `px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                        isActive 
+                        ? 'bg-blue-600 text-white shadow-md' 
+                        : 'bg-slate-200/60 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700'
+                    }`;
+                    btn.innerHTML = `<i class="fa-solid ${subj.icon}"></i> ${subj.name}`;
+                    btn.onclick = () => {
+                        this.currentSubjectIdx = idx;
+                        this.currentQuestionIdx = 0;
+                        this.renderSubjectTabs();
+                        this.loadQuestion();
+                    };
+                    container.appendChild(btn);
+                });
+            }
+
+            loadQuestion() {
+                const trainer = QUIZ_DATA[this.currentTrainerIdx];
+                const subject = trainer.subjects[this.currentSubjectIdx];
+                const q = subject.questions[this.currentQuestionIdx];
+                const answerKey = `${this.currentSubjectIdx}-${this.currentQuestionIdx}`;
+                const savedAnswer = this.userAnswers[answerKey];
+
+                // Subject Badge
+                const badge = document.getElementById('subjectBadge');
+                badge.innerHTML = `<i class="fa-solid ${subject.icon}"></i> ${subject.name}`;
+
+                // Question Counter
+                document.getElementById('questionCounter').innerText = `Вопрос ${this.currentQuestionIdx + 1} из ${subject.questions.length}`;
+
+                // Overall progress
+                const globalIndex = (this.currentSubjectIdx * 5) + this.currentQuestionIdx + 1;
+                const totalQuestions = 25;
+                const percent = Math.round((globalIndex / totalQuestions) * 100);
+                document.getElementById('progressText').innerText = `Вопрос ${globalIndex} из ${totalQuestions}`;
+                document.getElementById('progressPercent').innerText = `${percent}%`;
+                document.getElementById('progressBar').style.width = `${percent}%`;
+
+                // Question text
+                document.getElementById('questionText').innerText = q.q;
+
+                // Render options
+                const optionsContainer = document.getElementById('optionsContainer');
+                optionsContainer.innerHTML = '';
+
+                q.options.forEach((optText, optIdx) => {
+                    const optBtn = document.createElement('button');
+                    let btnStyle = "w-full text-left p-4 rounded-2xl border transition-all text-sm font-medium flex items-center justify-between ";
+
+                    if (savedAnswer !== undefined) {
+                        if (optIdx === q.correct) {
+                            btnStyle += "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold";
+                        } else if (optIdx === savedAnswer) {
+                            btnStyle += "bg-rose-500/10 border-rose-500 text-rose-700 dark:text-rose-400";
+                        } else {
+                            btnStyle += "border-slate-200 dark:border-slate-800 opacity-50";
+                        }
+                    } else {
+                        btnStyle += "border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30";
+                    }
+
+                    optBtn.className = btnStyle;
+                    optBtn.innerHTML = `
+                        <span>${optText}</span>
+                        ${savedAnswer !== undefined && optIdx === q.correct ? '<i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>' : ''}
+                        ${savedAnswer !== undefined && optIdx === savedAnswer && optIdx !== q.correct ? '<i class="fa-solid fa-circle-xmark text-rose-500 text-base"></i>' : ''}
+                    `;
+
+                    optBtn.onclick = () => {
+                        if (savedAnswer === undefined) {
+                            this.selectAnswer(optIdx);
+                        }
+                    };
+
+                    optionsContainer.appendChild(optBtn);
+                });
+
+                // Explanation Box
+                const explanationBox = document.getElementById('explanationBox');
+                if (savedAnswer !== undefined) {
+                    explanationBox.classList.remove('hidden');
+                    const isCorrect = savedAnswer === q.correct;
+                    const header = document.getElementById('explanationHeader');
+                    header.className = `font-bold flex items-center gap-2 ${isCorrect ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`;
+                    header.innerHTML = isCorrect 
+                        ? '<i class="fa-solid fa-circle-check"></i> Правильно!' 
+                        : '<i class="fa-solid fa-triangle-exclamation"></i> Неправильно';
+                    document.getElementById('explanationText').innerText = q.explanation;
+                } else {
+                    explanationBox.classList.add('hidden');
+                }
+
+                // Prev/Next buttons
+                const prevBtn = document.getElementById('prevBtn');
+                prevBtn.disabled = (this.currentSubjectIdx === 0 && this.currentQuestionIdx === 0);
+
+                const nextBtn = document.getElementById('nextBtn');
+                const isLastQuestion = (this.currentSubjectIdx === trainer.subjects.length - 1 && this.currentQuestionIdx === subject.questions.length - 1);
+                nextBtn.innerHTML = isLastQuestion 
+                    ? 'Завершить <i class="fa-solid fa-flag-checkered text-xs"></i>' 
+                    : 'Далее <i class="fa-solid fa-chevron-right text-xs"></i>';
+            }
+
+            selectAnswer(optIdx) {
+                const answerKey = `${this.currentSubjectIdx}-${this.currentQuestionIdx}`;
+                this.userAnswers[answerKey] = optIdx;
+                this.loadQuestion();
+            }
+
+            prevQuestion() {
+                if (this.currentQuestionIdx > 0) {
+                    this.currentQuestionIdx--;
+                } else if (this.currentSubjectIdx > 0) {
+                    this.currentSubjectIdx--;
+                    this.currentQuestionIdx = 4;
+                    this.renderSubjectTabs();
+                }
+                this.loadQuestion();
+            }
+
+            nextQuestion() {
+                const trainer = QUIZ_DATA[this.currentTrainerIdx];
+                const subject = trainer.subjects[this.currentSubjectIdx];
+
+                if (this.currentQuestionIdx < subject.questions.length - 1) {
+                    this.currentQuestionIdx++;
+                    this.loadQuestion();
+                } else if (this.currentSubjectIdx < trainer.subjects.length - 1) {
+                    this.currentSubjectIdx++;
+                    this.currentQuestionIdx = 0;
+                    this.renderSubjectTabs();
+                    this.loadQuestion();
+                } else {
+                    this.finishQuiz();
+                }
+            }
+
+            finishQuiz() {
+                document.getElementById('viewQuiz').classList.add('hidden');
+                document.getElementById('viewResults').classList.remove('hidden');
+
+                const trainer = QUIZ_DATA[this.currentTrainerIdx];
+                let totalCorrect = 0;
+                const subjectScores = [];
+
+                trainer.subjects.forEach((subj, sIdx) => {
+                    let sCorrect = 0;
+                    subj.questions.forEach((q, qIdx) => {
+                        const userAns = this.userAnswers[`${sIdx}-${qIdx}`];
+                        if (userAns === q.correct) {
+                            sCorrect++;
+                            totalCorrect++;
+                        }
+                    });
+                    subjectScores.push({ name: subj.name, score: sCorrect, icon: subj.icon });
+                });
+
+                const totalQuestions = 25;
+                const percent = Math.round((totalCorrect / totalQuestions) * 100);
+
+                document.getElementById('finalScoreText').innerText = `${totalCorrect} / ${totalQuestions}`;
+                document.getElementById('finalPercentText').innerText = `${percent}%`;
+
+                let grade = "Отлично";
+                if (percent < 50) grade = "Удовлетворительно";
+                else if (percent < 80) grade = "Хорошо";
+                document.getElementById('finalGradeText').innerText = grade;
+
+                // Render Subject Breakdown
+                const breakdownContainer = document.getElementById('subjectBreakdown');
+                breakdownContainer.innerHTML = '';
+
+                subjectScores.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs sm:text-sm";
+                    row.innerHTML = `
+                        <span class="font-medium flex items-center gap-2"><i class="fa-solid ${item.icon} text-blue-500"></i> ${item.name}</span>
+                        <span class="font-bold">${item.score} из 5 правильных</span>
+                    `;
+                    breakdownContainer.appendChild(row);
+                });
+
+                // Reset certificate view
+                document.getElementById('certificateContainer').classList.add('hidden');
+                this.lastTotalCorrect = totalCorrect;
+                this.lastPercent = percent;
+            }
+
+            generateCertificate() {
+                const nameInput = document.getElementById('userNameInput').value.trim();
+                const userName = nameInput || "Ученик";
+                const trainer = QUIZ_DATA[this.currentTrainerIdx];
+
+                const canvas = document.getElementById('certificateCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // Clear Canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Background Gradient
+                const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(1, '#f8fafc');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Outer Decorative Border
+                ctx.lineWidth = 12;
+                ctx.strokeStyle = '#1e3a8a'; // Deep Navy
+                ctx.strokeRect(25, 25, canvas.width - 50, canvas.height - 50);
+
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#d97706'; // Gold accent
+                ctx.strokeRect(37, 37, canvas.width - 74, canvas.height - 74);
+
+                // Header / Badge Symbol
+                ctx.fillStyle = '#d97706';
+                ctx.font = 'bold 20px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('СЕРТИФИКАТ ОБ УСПЕШНОМ ОБУЧЕНИИ', canvas.width / 2, 95);
+
+                // Title
+                ctx.fillStyle = '#0f172a';
+                ctx.font = '800 38px "Playfair Display", serif';
+                ctx.fillText('СЕРТИФИКАТ', canvas.width / 2, 150);
+
+                ctx.fillStyle = '#64748b';
+                ctx.font = '16px Inter, sans-serif';
+                ctx.fillText('Настоящий сертификат подтверждает, что', canvas.width / 2, 195);
+
+                // Student Name
+                ctx.fillStyle = '#1d4ed8';
+                ctx.font = 'bold 36px "Playfair Display", serif';
+                ctx.fillText(userName, canvas.width / 2, 250);
+
+                // Decorative Line under Name
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2 - 150, 270);
+                ctx.lineTo(canvas.width / 2 + 150, 270);
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Description
+                ctx.fillStyle = '#334155';
+                ctx.font = '16px Inter, sans-serif';
+                ctx.fillText(`успешно прошел(а) тестирование в интерактивном комплексе:`, canvas.width / 2, 310);
+
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 20px Inter, sans-serif';
+                ctx.fillText(`«${trainer.title}»`, canvas.width / 2, 345);
+
+                // Subjects List
+                ctx.fillStyle = '#475569';
+                ctx.font = '14px Inter, sans-serif';
+                const subjectNames = trainer.subjects.map(s => s.name).join(' • ');
+                ctx.fillText(`Предметный блок: ${subjectNames}`, canvas.width / 2, 385);
+
+                // Results Summary Box
+                ctx.fillStyle = '#f1f5f9';
+                ctx.roundRect(canvas.width / 2 - 220, 420, 440, 75, 12);
+                ctx.fill();
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.stroke();
+
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 18px Inter, sans-serif';
+                ctx.fillText(`Итоговый результат: ${this.lastTotalCorrect} из 25 (${this.lastPercent}%)`, canvas.width / 2, 452);
+
+                ctx.fillStyle = '#16a34a';
+                ctx.font = 'bold 14px Inter, sans-serif';
+                ctx.fillText(`Статус: Зачтено со знаком отличия`, canvas.width / 2, 478);
+
+                // Footer - Date & Stamp
+                const today = new Date().toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px Inter, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Дата выдачи: ${today}`, 70, 600);
+                ctx.fillText(`ID сертификата: #${Math.floor(100000 + Math.random() * 900000)}`, 70, 625);
+
+                // Stamp / Seal Design
+                ctx.save();
+                ctx.translate(800, 580);
+                
+                // Outer Seal Ring
+                ctx.beginPath();
+                ctx.arc(0, 0, 50, 0, Math.PI * 2);
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Inner Seal Ring
+                ctx.beginPath();
+                ctx.arc(0, 0, 42, 0, Math.PI * 2);
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = '#d97706';
+                ctx.font = 'bold 10px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('ПРОВЕРЕНО', 0, -10);
+                ctx.font = 'bold 14px Inter, sans-serif';
+                ctx.fillText('★ 100% ★', 0, 8);
+                ctx.font = '9px Inter, sans-serif';
+                ctx.fillText('ШКОЛЬНЫЙ ТРЕНОЖЁР', 0, 24);
+                
+                ctx.restore();
+
+                document.getElementById('certificateContainer').classList.remove('hidden');
+                document.getElementById('certificateContainer').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            downloadCertificate() {
+                const canvas = document.getElementById('certificateCanvas');
+                const link = document.createElement('a');
+                link.download = `Сертификат_Тренажёр_${this.currentTrainerIdx + 1}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+
+            printCertificate() {
+                const canvas = document.getElementById('certificateCanvas');
+                const imgData = canvas.toDataURL('image/png');
+                const printImg = document.getElementById('printImage');
+                printImg.src = imgData;
+                window.print();
+            }
+        }
+
+        // Initialize application on load
+        let app;
+        window.onload = () => {
+            app = new App();
+            app.init();
+        };
+    </script>
+</body>
+</html>
